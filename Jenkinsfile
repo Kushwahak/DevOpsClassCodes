@@ -1,111 +1,69 @@
-pipeline{
+pipeline {
+
     tools{
-        jdk 'jdk'
+
         maven 'mvn'
-    }
-    environment { 
 
-        registry = "mohitkhokhar172/sample" 
-
-        registryCredential = 'devopslearner45' 
-
-        dockerImage = '' 
+        jdk 'jdk8'
 
     }
-    agent none
-    stages{
-        stage('Checkout'){
-            agent any
-            steps{
-                git 'https://github.com/devops-trainer/DevOpsClassCodes.git'
+
+    agent any
+
+ 
+
+    stages {
+
+        stage('checkout') {
+
+            steps {
+
+                git 'https://github.com/samiksha0700/DevOpsClassCodes.git'
+
             }
+
         }
-        stage('Compile'){
-            agent any
+
+        stage('pipeline1'){
+
             steps{
+
                 sh 'mvn compile'
+
             }
+
         }
-        stage('CodeReview'){
-            agent any
+
+        stage('test'){
+
             steps{
-                sh 'mvn pmd:pmd'
-            }
-        }
-        stage('UnitTest'){
-            agent any
-            steps{
-                //git 'https://github.com/devops-trainer/DevOpsClassCodes.git'
+
                 sh 'mvn test'
+
             }
+
         }
-        stage('MetricCheck'){
-            agent any
+
+        stage('code coverage'){
+
             steps{
-                sh 'mvn cobertura:cobertura -Dcobertura.report.format=xml'
+
+                sh 'mvn pmd:pmd'
+
             }
+
         }
-        stage('Package'){
-            agent any
+
+        stage('package'){
+
             steps{
+
                 sh 'mvn package'
-            }
-        }
-    
-
-
-        stage('Cloning our Git') { 
-agent any
-            steps { 
-
-                git 'https://github.com/mohitkhokhar172/DevOpsClassCodes.git' 
 
             }
-
-        } 
-
-        stage('Building our image') { 
-agent any
-            steps { 
-
-                script { 
-                    sh 'whoami'
-                    dockerImage = docker.build registry + ":$BUILD_NUMBER" 
-
-                }
-
-            } 
 
         }
-
-        stage('Deploy our image') { 
-agent any
-            steps { 
-
-                script { 
-
-                    docker.withRegistry( '', registryCredential ) { 
-                        dockerImage.push() 
-                    }
-
-                } 
-
-            }
-
-        } 
-
-        stage('Cleaning up') { 
-agent any
-            steps { 
-
-                sh "docker rmi $registry:$BUILD_NUMBER" 
-
-            }
-
-        } 
 
     }
-
-
 
 }
